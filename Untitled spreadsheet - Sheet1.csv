@@ -1,0 +1,105 @@
+#Install and load library
+"install.packages(""caret"")"
+"install.packages(""rpart"")"
+
+library(rpart)
+library(caret)
+library(class)
+library(e1071)
+
+"df<-read.csv(""C:\\Users\\91935\\Downloads\\heart.csv"")"
+df=na.omit(df)
+view(df)
+str(df)
+"cor(df$Current.Smoker,df$BP)"
+"df=df[!duplicated(df),]"
+set.seed(123)
+"train_indices<-sample(1:nrow(df),0.8*nrow(df))"
+"train_data<-df[train_indices,]"
+"test_data<-df[-train_indices,]"
+
+# Train a KNN model
+"knn_model<-knn(train=train_data,"
+"test=test_data,"
+"cl=train_data$DEATH_EVENT,"
+k=3
+)
+
+# Evaluate the model
+"confusion_matrix <- table(knn_model, test_data$DEATH_EVENT)"
+print(confusion_matrix)
+
+# Calculate accuracy
+accuracy <- sum(diag(confusion_matrix)) / sum(confusion_matrix)
+"print(paste(""Accuracy:"", accuracy))"
+
+#Naive Bayes Model
+# Train a Naive Bayes model
+"nb_model <- naiveBayes(DEATH_EVENT ~ ., data = train_data)"
+
+# Make predictions on the test set
+"predictions <- predict(nb_model, newdata = test_data)"
+
+# Evaluate the model
+"confusion_matrix <- table(predictions, test_data$DEATH_EVENT)"
+print(confusion_matrix)
+
+# Calculate accuracy
+accuracy <- sum(diag(confusion_matrix)) / sum(confusion_matrix)
+"print(paste(""Accuracy:"", accuracy))"
+
+# Decision Tree Model
+
+# Train a Decision Tree model
+
+"dt_model <- rpart (DEATH_EVENT ~., data =train_data, method= ""class"")"
+
+# Make predictions on the test set
+"predictions_dt <- predict(dt_model, newdata = test_data, type=""class"")"
+
+# Evaluate the model
+
+"confusion_matrix_dt <- table(predictions_dt, test_data$DEATH_EVENT)"
+print(confusion_matrix_dt)
+
+# Calculate accuracy
+
+accuracy_dt <- sum(diag(confusion_matrix_dt)) / sum(confusion_matrix_dt)
+"print (paste(""Decision Tree Accuracy:"", accuracy_dt))"
+
+
+# Train a Logistic Regression model
+"logistic_model <- glm(DEATH_EVENT ~ ., data = train_data, family = ""binomial"")"
+
+# Make predictions on the test set
+"predictions_logistic <- predict(logistic_model, newdata = test_data, type = ""response"")"
+
+"logistic_predictions <- ifelse(predictions_logistic > 0.5, 1, 0)"
+
+# Evaluate the Logistic Regression model
+"confusion_matrix_logistic <- table(logistic_predictions, test_data$DEATH_EVENT)"
+
+
+accuracy_logistic <- sum(diag(confusion_matrix_logistic)) / sum(confusion_matrix_logistic)
+"print(paste(""Logistic Regression Accuracy:"", accuracy_logistic))"
+
+
+"install.packages(""ClusterR"")"
+"install.packages(""cluster"")"
+
+# Loading package
+library(ClusterR)
+library(cluster)
+
+# Apply K-Means for clustering (example with two clusters)
+"kmeans_clusters <- kmeans(df[, -which(names(df) == ""DEATH_EVENT"")], centers = 2)"
+
+# Print cluster assignments
+print(kmeans_clusters$cluster)
+
+# Confusion Matrix
+"cm <- table(df$DEATH_EVENT, kmeans_clusters$cluster)"
+
+#Accuracy
+accuracy_logistic <- sum(diag(cm)) / sum(cm)
+"print(paste(""K Mean Clusturing Accuracy:"", accuracy_logistic))"
